@@ -33,15 +33,15 @@ class _LoginScreenState extends State<LoginScreen> {
     final String username = _usernameController.text;
     final String password = _passwordController.text;
 
-    final Uri url = Uri.parse('https://kc.mycity.evxtest.monster/realms/Test_Ruju/protocol/openid-connect/token');
+    final Uri url = Uri.parse('https://kc.mycity.evxtest.monster/realms/my_city_dev/protocol/openid-connect/token');
     final response = await http.post(
       url,
       body: {
         'username': username,
         'password': password,
-        'client_id' : 'my_city_mobile_test',
+        'client_id' : 'my_city_mobile',
         'grant_type' : 'password',
-        'client_secret' : 'AEyGmazXXESR1KfRk8fsffdvKJnNAgb6'
+        'client_secret' : 's0rauSkqlJBCmySuL7hdrpjf68ShXuwO'
       },
     );
 
