@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/services.dart'; // Import for Clipboard functionality
 
 void main() {
   runApp(MyApp());
@@ -33,22 +34,22 @@ class _LoginScreenState extends State<LoginScreen> {
     final String username = _usernameController.text;
     final String password = _passwordController.text;
 
-    final Uri url = Uri.parse('https://kc.mycity.evxtest.monster/realms/my_city_dev/protocol/openid-connect/token');
+    final Uri url = Uri.parse(
+        'https://kc.mycity.evxtest.monster/realms/my_city_dev/protocol/openid-connect/token');
     final response = await http.post(
       url,
       body: {
         'username': username,
         'password': password,
-        'client_id' : 'my_city_mobile',
-        'grant_type' : 'password',
-        'client_secret' : 's0rauSkqlJBCmySuL7hdrpjf68ShXuwO'
+        'client_id': 'my_city_mobile',
+        'grant_type': 'password',
+        'client_secret': 's0rauSkqlJBCmySuL7hdrpjf68ShXuwO'
       },
     );
 
     if (response.statusCode == 200) {
-      // print(response.body);
       final Map<String, dynamic> responseData = json.decode(response.body);
-      print(responseData);
+      print(responseData['access_token']);
       setState(() {
         _token = responseData['access_token'];
       });
@@ -58,6 +59,16 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed!')),
+      );
+    }
+  }
+
+  // Function to copy the token to the clipboard
+  void _copyTokenToClipboard() {
+    if (_token.isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: _token));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Token copied to clipboard!')),
       );
     }
   }
@@ -87,7 +98,22 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text('Login'),
             ),
             SizedBox(height: 20),
-            Text('Token: $_token'),
+            if (_token.isNotEmpty) // Show token and copy button only if token is not empty
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Token: $_token',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  IconButton(
+                    icon: Icon(Icons.copy),
+                    onPressed: _copyTokenToClipboard,
+                  ),
+                ],
+              ),
           ],
         ),
       ),
